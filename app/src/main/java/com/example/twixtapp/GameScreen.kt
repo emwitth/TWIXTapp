@@ -27,7 +27,7 @@ class GameScreen : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = GameScreenBinding.inflate(inflater, container, false)
 
@@ -59,9 +59,9 @@ class GameScreen : Fragment() {
 
         override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
             screen.mScaleFactor *= scaleGestureDetector.scaleFactor
-            screen.mScaleFactor = Math.max(0.1f, Math.min(screen.mScaleFactor, 10.0f))
-            screen.binding.boardImage.setScaleX(screen.mScaleFactor)
-            screen.binding.boardImage.setScaleY(screen.mScaleFactor)
+            screen.mScaleFactor = 0.1f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(10.0f))
+            screen.binding.boardImage.scaleX = screen.mScaleFactor
+            screen.binding.boardImage.scaleY = screen.mScaleFactor
             return true
         }
     }
