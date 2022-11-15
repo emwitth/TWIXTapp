@@ -2,6 +2,7 @@ package com.example.twixtapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import androidx.fragment.app.Fragment
@@ -60,6 +61,9 @@ class GameScreen : Fragment() {
         override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
             screen.mScaleFactor *= scaleGestureDetector.scaleFactor
             screen.mScaleFactor = 0.1f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(10.0f))
+            if(screen.mScaleFactor < 0.95) {
+                screen.mScaleFactor = 0.95F
+            }
             screen.binding.boardImage.scaleX = screen.mScaleFactor
             screen.binding.boardImage.scaleY = screen.mScaleFactor
             return true
