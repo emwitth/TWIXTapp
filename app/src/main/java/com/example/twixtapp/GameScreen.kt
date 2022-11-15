@@ -1,12 +1,13 @@
 package com.example.twixtapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.*
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.twixtapp.databinding.GameScreenBinding
+
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -19,12 +20,24 @@ class GameScreen : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private var scaleGestureDetector: ScaleGestureDetector? = null
+    private var mScaleFactor = 1.0f
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         _binding = GameScreenBinding.inflate(inflater, container, false)
+
+        binding.root.setOnTouchListener(View.OnTouchListener { _, event ->
+            scaleGestureDetector?.onTouchEvent(event)
+            return@OnTouchListener true
+        })
+
+        scaleGestureDetector = ScaleGestureDetector(this.context, ScaleListener(this))
+
         return binding.root
 
     }
@@ -40,5 +53,16 @@ class GameScreen : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
+
+        override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
+            screen.mScaleFactor *= scaleGestureDetector.scaleFactor
+            screen.mScaleFactor = Math.max(0.1f, Math.min(screen.mScaleFactor, 10.0f))
+            screen.binding.boardImage.setScaleX(screen.mScaleFactor)
+            screen.binding.boardImage.setScaleY(screen.mScaleFactor)
+            return true
+        }
     }
 }
