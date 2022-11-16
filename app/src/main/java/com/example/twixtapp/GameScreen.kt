@@ -1,6 +1,7 @@
 package com.example.twixtapp
 
 import android.annotation.SuppressLint
+import android.graphics.PointF
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -22,7 +23,7 @@ class GameScreen : Fragment() {
     private val binding get() = _binding!!
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
-    private var mScaleFactor = 1.0f
+    private var mScaleFactor = 1.0F
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -57,15 +58,29 @@ class GameScreen : Fragment() {
     }
 
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
+        private val viewportFocus = PointF()
+        private var lastFocusX = 0F;
+        private var lastFocusY = 0F;
+
+        override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+            lastFocusY = detector.focusY
+            lastFocusX = detector.focusX
+            return true
+        }
 
         override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
             screen.mScaleFactor *= scaleGestureDetector.scaleFactor
-            screen.mScaleFactor = 0.1f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(10.0f))
-            if(screen.mScaleFactor < 0.95) {
-                screen.mScaleFactor = 0.95F
-            }
+            screen.mScaleFactor = 0.95f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(10.0f))
+
             screen.binding.boardImage.scaleX = screen.mScaleFactor
             screen.binding.boardImage.scaleY = screen.mScaleFactor
+
+            screen.binding.boardImage.translationX += scaleGestureDetector.focusX - lastFocusX
+            screen.binding.boardImage.translationY += scaleGestureDetector.focusY - lastFocusY
+
+            lastFocusX = scaleGestureDetector.focusX
+            lastFocusY = scaleGestureDetector.focusY
+
             return true
         }
     }
