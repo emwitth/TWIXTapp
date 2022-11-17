@@ -1,10 +1,10 @@
 package com.example.twixtapp
 
 import android.annotation.SuppressLint
-import android.graphics.PointF
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -23,7 +23,10 @@ class GameScreen : Fragment() {
     private val binding get() = _binding!!
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
+    private var mGestureDetector: GestureDetector? = null
     private var mScaleFactor = 1.0F
+    private var lastFocusX = 0f
+    private var lastFocusY = 0f
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -33,12 +36,17 @@ class GameScreen : Fragment() {
 
         _binding = GameScreenBinding.inflate(inflater, container, false)
 
+        scaleGestureDetector = ScaleGestureDetector(this.context, ScaleListener(this))
+        mGestureDetector = GestureDetector(this.context, MyGestureListener(this))
+
+
         binding.root.setOnTouchListener(View.OnTouchListener { _, event ->
+            if(scaleGestureDetector?.isInProgress == false) {
+                mGestureDetector?.onTouchEvent(event)
+            }
             scaleGestureDetector?.onTouchEvent(event)
             return@OnTouchListener true
         })
-
-        scaleGestureDetector = ScaleGestureDetector(this.context, ScaleListener(this))
 
         return binding.root
 
@@ -47,12 +55,19 @@ class GameScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        resetBoard()
+        binding.imageView.setImageResource(R.drawable.nothingsquare)
+
         binding.exitButton.setOnClickListener {
             findNavController().navigate(R.id.action_GameScreen_to_HomeScreen)
         }
 
         binding.resetBoardButton.setOnClickListener {
             resetBoard()
+        }
+
+        binding.imageView.setOnClickListener {
+            binding.imageView.setImageResource(R.drawable.square)
         }
     }
 
@@ -71,13 +86,10 @@ class GameScreen : Fragment() {
     }
 
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
-        private val viewportFocus = PointF()
-        private var lastFocusX = 0f
-        private var lastFocusY = 0f
 
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-            lastFocusY = detector.focusY
-            lastFocusX = detector.focusX
+            screen.lastFocusY = detector.focusY
+            screen.lastFocusX = detector.focusX
             return true
         }
 
@@ -88,13 +100,47 @@ class GameScreen : Fragment() {
             screen.binding.boardImage.scaleX = screen.mScaleFactor
             screen.binding.boardImage.scaleY = screen.mScaleFactor
 
-            screen.binding.boardImage.translationX += scaleGestureDetector.focusX - lastFocusX
-            screen.binding.boardImage.translationY += scaleGestureDetector.focusY - lastFocusY
+//            screen.binding.boardImage.translationX += scaleGestureDetector.focusX - screen.lastFocusX
+//            screen.binding.boardImage.translationY += scaleGestureDetector.focusY - screen.lastFocusY
 
-            lastFocusX = scaleGestureDetector.focusX
-            lastFocusY = scaleGestureDetector.focusY
+            screen.lastFocusX = scaleGestureDetector.focusX
+            screen.lastFocusY = scaleGestureDetector.focusY
 
             return true
         }
+    }
+
+    private class MyGestureListener(var screen: GameScreen) : SimpleOnGestureListener() {
+        override fun onDown(event: MotionEvent?): Boolean {
+            Log.d("rootbeer", "onDown: ")
+
+            // don't return false here or else none of the other
+            // gestures will work
+            return true
+        }
+
+        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+            Log.i("rootbeer", "onSingleTapConfirmed: ")
+            return true
+        }
+
+        override fun onDoubleTap(e: MotionEvent?): Boolean {
+            Log.i("rootbeer", "onDoubleTap: ")
+            screen.resetBoard()
+            return true
+        }
+
+        override fun onScroll(
+            e1: MotionEvent?, e2: MotionEvent?,
+            distanceX: Float, distanceY: Float
+        ): Boolean {
+            Log.i("rootbeer", "onScroll: ")
+            if(e1 != null && e2!= null) {
+                screen.binding.boardImage.translationX -= distanceX
+                screen.binding.boardImage.translationY -= distanceY
+            }
+            return true
+        }
+
     }
 }

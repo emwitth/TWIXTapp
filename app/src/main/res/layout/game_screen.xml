@@ -6,17 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".GameScreen">
 
-    <ImageView
+    <com.example.twixtapp.BoardView
         android:id="@+id/board_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:cropToPadding="false"
-        android:scaleType="fitXY"
-        android:src="@drawable/board"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/drawer_background"
@@ -59,5 +55,15 @@
         app:layout_constraintEnd_toEndOf="@+id/drawer_background"
         app:layout_constraintStart_toEndOf="@+id/exit_button"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_background" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/board_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
