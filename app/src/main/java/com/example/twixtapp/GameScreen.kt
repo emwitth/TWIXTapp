@@ -47,8 +47,12 @@ class GameScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonSecond.setOnClickListener {
+        binding.exitButton.setOnClickListener {
             findNavController().navigate(R.id.action_GameScreen_to_HomeScreen)
+        }
+
+        binding.resetBoardButton.setOnClickListener {
+            resetBoard()
         }
     }
 
@@ -57,10 +61,19 @@ class GameScreen : Fragment() {
         _binding = null
     }
 
+    fun resetBoard() {
+        mScaleFactor = 0.95f
+        binding.boardImage.scaleX = mScaleFactor
+        binding.boardImage.scaleY = mScaleFactor
+
+        binding.boardImage.translationX = 0f
+        binding.boardImage.translationY = 0f
+    }
+
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
         private val viewportFocus = PointF()
-        private var lastFocusX = 0F;
-        private var lastFocusY = 0F;
+        private var lastFocusX = 0f
+        private var lastFocusY = 0f
 
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
             lastFocusY = detector.focusY

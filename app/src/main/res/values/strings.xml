@@ -5,7 +5,9 @@
     <string name="home_screen_label">Home Screen</string>
     <string name="game_screen_label">Game Screen</string>
     <string name="play">Play Game</string>
-    <string name="previous">Previous</string>
+    <string name="exit">Exit</string>
+    <string name="reset">Reset Board</string>
+    <string name="place">Place Piece</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
