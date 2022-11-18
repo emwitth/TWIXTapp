@@ -100,8 +100,8 @@ class GameScreen : Fragment() {
             screen.binding.boardImage.scaleX = screen.mScaleFactor
             screen.binding.boardImage.scaleY = screen.mScaleFactor
 
-//            screen.binding.boardImage.translationX += scaleGestureDetector.focusX - screen.lastFocusX
-//            screen.binding.boardImage.translationY += scaleGestureDetector.focusY - screen.lastFocusY
+            screen.binding.boardImage.translationX += scaleGestureDetector.focusX - screen.lastFocusX
+            screen.binding.boardImage.translationY += scaleGestureDetector.focusY - screen.lastFocusY
 
             screen.lastFocusX = scaleGestureDetector.focusX
             screen.lastFocusY = scaleGestureDetector.focusY
@@ -120,12 +120,13 @@ class GameScreen : Fragment() {
         }
 
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-            Log.i("rootbeer", "onSingleTapConfirmed: ")
+            if(e != null) {
+                screen.binding.boardImage.touchPoint(e.x, e.y, screen.mScaleFactor)
+            }
             return true
         }
 
         override fun onDoubleTap(e: MotionEvent?): Boolean {
-            Log.i("rootbeer", "onDoubleTap: ")
             screen.resetBoard()
             return true
         }
@@ -134,7 +135,6 @@ class GameScreen : Fragment() {
             e1: MotionEvent?, e2: MotionEvent?,
             distanceX: Float, distanceY: Float
         ): Boolean {
-            Log.i("rootbeer", "onScroll: ")
             if(e1 != null && e2!= null) {
                 screen.binding.boardImage.translationX -= distanceX
                 screen.binding.boardImage.translationY -= distanceY
