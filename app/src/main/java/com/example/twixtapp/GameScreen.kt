@@ -56,7 +56,6 @@ class GameScreen : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         resetBoard()
-        binding.imageView.setImageResource(R.drawable.nothingsquare)
 
         binding.exitButton.setOnClickListener {
             findNavController().navigate(R.id.action_GameScreen_to_HomeScreen)
@@ -64,10 +63,6 @@ class GameScreen : Fragment() {
 
         binding.resetBoardButton.setOnClickListener {
             resetBoard()
-        }
-
-        binding.imageView.setOnClickListener {
-            binding.imageView.setImageResource(R.drawable.square)
         }
     }
 
