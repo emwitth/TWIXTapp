@@ -12,7 +12,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var size = 320
     private var backgroundImage = ContextCompat.getDrawable(this.context, R.drawable.board)
 
-    private var boardArray = Array(24) { IntArray(24) }
+    private var boardArray = Array(24) { Array(24){ Node() } }
     private var xCoords = Array(24) { FloatArray(24) }
     private var yCoords = Array(24) { FloatArray(24) }
 
@@ -32,12 +32,11 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private fun drawPegs(canvas: Canvas) {
 //        Log.d("rootbeer", "in drawPegs")
-        paint.color = Color.CYAN
         paint.style = Paint.Style.FILL
         for((r, row) in boardArray.withIndex()) {
             for((c, column) in row.withIndex()) {
-//                canvas.drawCircle(xCoords[r][c], yCoords[r][c], 8f, paint)
-                if(boardArray[r][c] == 1) {
+                if(boardArray[r][c].isShown) {
+                    paint.color = boardArray[r][c].color
                     canvas.drawCircle(xCoords[r][c], yCoords[r][c], 8f, paint)
                     Log.d("rootbeer", "$r, $c")
                     Log.d("rootbeer", "" + xCoords[r][c] + " " + yCoords[r][c])
@@ -62,7 +61,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val column = kotlin.math.floor(xOnBoard / (this.width / 24))
         val row = kotlin.math.floor(yOnBoard / (this.width / 24))
         Log.d("rootbeer", "row: $row, column: $column")
-        boardArray[row.toInt()][column.toInt()] = 1
+        boardArray[row.toInt()][column.toInt()].isShown = true
         this.invalidate()
     }
 
