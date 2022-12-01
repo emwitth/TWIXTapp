@@ -15,6 +15,8 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var boardArray = Array(24) { Array(24){ Node() } }
     private var xCoords = Array(24) { FloatArray(24) }
     private var yCoords = Array(24) { FloatArray(24) }
+    private var redWalls = HashMap<Wall,WallCoords>()
+    private var blackWalls = HashMap<Wall,WallCoords>()
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val setupCoords = SetupCoords()
@@ -28,6 +30,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         backgroundImage?.draw(canvas)
 
         drawPegs(canvas)
+        drawRedWalls(canvas)
     }
 
     private fun drawPegs(canvas: Canvas) {
@@ -45,6 +48,15 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
     }
 
+    private fun drawRedWalls(canvas: Canvas) {
+        paint.style = Paint.Style.FILL
+        paint.color = Color.CYAN
+        paint.strokeWidth = 5f
+        for(wall in redWalls.values) {
+            canvas.drawLine(wall.x1, wall.y1, wall.x2, wall.y2, paint)
+        }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         // 1
@@ -53,6 +65,38 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         setMeasuredDimension(size, size)
         setupCoords()
     }
+
+    private fun addPeg(row: Int, column: Int) {
+        boardArray[row][column].isShown = true
+        var rowChecks = arrayOf(   -2,-2,-1,-1, 1,1, 2,2)
+        var columnChecks = arrayOf(-1, 1,-2, 2,-2,2,-1,1)
+
+
+        for(i in rowChecks.indices)
+        {
+            var checkRow = row+rowChecks[i]
+            var checkCol = column+columnChecks[i]
+            if(checkRow < 0 || checkRow > 23 || checkCol < 0 || checkCol > 23) {
+                continue
+            }
+            else if(boardArray[row+rowChecks[i]][column+columnChecks[i]].isShown) {
+                addWall(Wall(row, row+rowChecks[i], column, column+columnChecks[i]))
+            }
+        }
+    }
+
+    private fun addWall(wall: Wall) {
+        if(wall !in redWalls) {
+            redWalls.put(wall,
+                WallCoords(
+                    xCoords[wall.row1][wall.column1],
+                    xCoords[wall.row2][wall.column2],
+                    yCoords[wall.row1][wall.column1],
+                    yCoords[wall.row2][wall.column2])
+            )
+        }
+    }
+
     fun touchPoint(x: Float, y: Float, sf: Float) {
         Log.d("rootbeer", "touched ($x, $y)")
         var xOnBoard = calculateCord(x, sf) - this.translationX/sf
@@ -61,7 +105,9 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val column = kotlin.math.floor(xOnBoard / (this.width / 24))
         val row = kotlin.math.floor(yOnBoard / (this.width / 24))
         Log.d("rootbeer", "row: $row, column: $column")
-        boardArray[row.toInt()][column.toInt()].isShown = true
+        if(!boardArray[row.toInt()][column.toInt()].isShown) {
+            addPeg(row.toInt(), column.toInt())
+        }
         this.invalidate()
     }
 
