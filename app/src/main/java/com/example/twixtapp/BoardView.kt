@@ -11,6 +11,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     // View size in pixels
     private var size = 320
     private var backgroundImage = ContextCompat.getDrawable(this.context, R.drawable.board)
+    private var isRedTurn = true
 
     private var boardArray = Array(24) { Array(24){ Node() } }
     private var xCoords = Array(24) { FloatArray(24) }
@@ -33,9 +34,9 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         backgroundImage?.bounds = imageBounds
         backgroundImage?.draw(canvas)
 
-        drawWalls(canvas, redWalls, Color.RED)
-        drawWalls(canvas, blackWalls, Color.BLACK)
-        drawWalls(canvas, tempWalls, Color.GRAY)
+        drawWalls(canvas, redWalls)
+        drawWalls(canvas, blackWalls)
+        drawWalls(canvas, tempWalls)
         drawPegs(canvas)
     }
 
@@ -54,11 +55,11 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
     }
 
-    private fun drawWalls(canvas: Canvas, walls: HashMap<Wall,WallCoords>, color: Int) {
+    private fun drawWalls(canvas: Canvas, walls: HashMap<Wall,WallCoords>) {
         paint.style = Paint.Style.FILL
-        paint.color = color
         paint.strokeWidth = 5f
         for(wall in walls.values) {
+            paint.color = wall.color
             canvas.drawLine(wall.x1, wall.y1, wall.x2, wall.y2, paint)
         }
     }
@@ -77,7 +78,13 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             boardArray[tempRow][tempColumn].isShown = false
         }
         boardArray[row][column].isShown = true
-        boardArray[row][column].color = Color.GRAY
+
+        var color = if(isRedTurn){
+            Color.parseColor("#ffb6c1")
+        } else {
+            Color.GRAY
+        }
+        boardArray[row][column].color = color
         tempRow = row
         tempColumn = column
 
@@ -93,8 +100,9 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             if(checkRow < 0 || checkRow > 23 || checkCol < 0 || checkCol > 23) {
                 continue
             }
-            else if(boardArray[checkRow][checkCol].isShown) {
-                addWall(Wall(row, checkRow, column, checkCol), tempWalls)
+            else if(boardArray[checkRow][checkCol].isShown &&
+                    boardArray[checkRow][checkCol].hasRightColor(isRedTurn)) {
+                addWall(Wall(row, checkRow, column, checkCol), tempWalls, color)
             }
         }
     }
@@ -102,51 +110,47 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     fun confirmPeg() {
         boardArray[tempRow][tempColumn].isShown = true
         boardArray[tempRow][tempColumn].isConfirmed = true
-        boardArray[tempRow][tempColumn].color = Color.RED
+        if(isRedTurn) {
+            boardArray[tempRow][tempColumn].color = Color.RED
+            boardArray[tempRow][tempColumn].isRed = true
 
-//        val rowChecks = arrayOf(   -2,-2,-1,-1, 1,1, 2,2)
-//        val columnChecks = arrayOf(-1, 1,-2, 2,-2,2,-1,1)
-//
-//
-//        for(i in rowChecks.indices)
-//        {
-//            val checkRow = tempRow+rowChecks[i]
-//            val checkCol = tempColumn+columnChecks[i]
-//            if(checkRow < 0 || checkRow > 23 || checkCol < 0 || checkCol > 23) {
-//                continue
-//            }
-//            else if(boardArray[checkRow][checkCol].isShown) {
-//                addWall(Wall(tempRow, checkRow, tempColumn, checkCol), redWalls)
-//            }
-//        }
+            for ((wall, wallCoords) in tempWalls.entries) {
+                redWalls[wall] = wallCoords
+                redWalls[wall]?.color = Color.RED
+            }
+        }
+        else {
+            boardArray[tempRow][tempColumn].color = Color.BLACK
+            boardArray[tempRow][tempColumn].isBlack = true
 
-        for((wall, wallCoords) in tempWalls.entries) {
-            redWalls.put(wall,wallCoords)
+            for ((wall, wallCoords) in tempWalls.entries) {
+                blackWalls[wall] = wallCoords
+                blackWalls[wall]?.color = Color.BLACK
+            }
         }
         tempWalls = HashMap()
 
+        isRedTurn = !isRedTurn
 
         this.invalidate()
     }
 
-    private fun addWall(wall: Wall, walls: HashMap<Wall,WallCoords>) {
+    private fun addWall(wall: Wall, walls: HashMap<Wall,WallCoords>, color: Int) {
         if(wall !in walls) {
             walls[wall] = WallCoords(
                 xCoords[wall.row1][wall.column1],
                 xCoords[wall.row2][wall.column2],
                 yCoords[wall.row1][wall.column1],
-                yCoords[wall.row2][wall.column2])
+                yCoords[wall.row2][wall.column2],
+                color)
         }
     }
 
     fun touchPoint(x: Float, y: Float, sf: Float) {
-        Log.d("rootbeer", "touched ($x, $y)")
         val xOnBoard = calculateCord(x, sf) - this.translationX/sf
         val yOnBoard = calculateCord(y, sf) - this.translationY/sf
-        Log.d("rootbeer", "($xOnBoard, $yOnBoard) relatively")
         val column = kotlin.math.floor(xOnBoard / (this.width / 24))
         val row = kotlin.math.floor(yOnBoard / (this.width / 24))
-        Log.d("rootbeer", "row: $row, column: $column")
         if(!boardArray[row.toInt()][column.toInt()].isConfirmed) {
             addPeg(row.toInt(), column.toInt())
         }
