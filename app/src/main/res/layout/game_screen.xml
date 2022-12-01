@@ -6,35 +6,54 @@
     android:layout_height="match_parent"
     tools:context=".GameScreen">
 
-    <TextView
-        android:id="@+id/textview_second"
+    <com.example.twixtapp.BoardView
+        android:id="@+id/board_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/button_second"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/previous"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_second" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
-        android:id="@+id/board_image"
+        android:id="@+id/drawer_background"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
         android:scaleType="fitXY"
-        android:src="@drawable/board"
+        android:src="@drawable/drawer"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent
-"/>
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/exit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/exit"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_background"
+        app:layout_constraintEnd_toStartOf="@id/reset_board_button"
+        app:layout_constraintStart_toStartOf="@+id/drawer_background"
+        app:layout_constraintTop_toTopOf="@+id/drawer_background" />
+
+    <Button
+        android:id="@+id/place_piece_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/place"
+        app:layout_constraintTop_toTopOf="@+id/drawer_background"
+        app:layout_constraintEnd_toEndOf="@id/drawer_background"
+        app:layout_constraintStart_toEndOf="@+id/exit_button"
+        app:layout_constraintBottom_toTopOf="@+id/reset_board_button" />
+
+    <Button
+        android:id="@+id/reset_board_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reset"
+        app:layout_constraintTop_toBottomOf="@+id/place_piece_button"
+        app:layout_constraintEnd_toEndOf="@+id/drawer_background"
+        app:layout_constraintStart_toEndOf="@+id/exit_button"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_background" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
