@@ -13,6 +13,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var size = 320
     private var backgroundImage = ContextCompat.getDrawable(this.context, R.drawable.board)
     private var isRedTurn = true
+    private var hasChosenValidOption = false
 
     private var boardArray = Array(24) { Array(24){ Node() } }
     private var xCoords = Array(24) { FloatArray(24) }
@@ -75,9 +76,19 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun addPeg(row: Int, column: Int) {
+        if(isRedTurn && (row == 0 || row == 23)) {
+            return
+        }
+        if(!isRedTurn && (column == 0 || column == 23)) {
+            return
+        }
+
         if(!boardArray[tempRow][tempColumn].isConfirmed) {
             boardArray[tempRow][tempColumn].isShown = false
         }
+
+        hasChosenValidOption = true
+
         boardArray[row][column].isShown = true
 
         var color = if(isRedTurn){
@@ -137,6 +148,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         tempWalls = HashMap()
 
         isRedTurn = !isRedTurn
+        hasChosenValidOption = false
 
         this.invalidate()
     }
@@ -204,6 +216,10 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     fun isRedTurn() : Boolean {
         return isRedTurn
+    }
+
+    fun hasChosenValidOption() : Boolean {
+        return hasChosenValidOption
     }
 
 }

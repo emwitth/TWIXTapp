@@ -67,8 +67,10 @@ class GameScreen : Fragment() {
         }
 
         binding.placePieceButton.setOnClickListener {
-            binding.boardImage.confirmPeg()
-            setTurnText()
+            if(binding.boardImage.hasChosenValidOption()) {
+                binding.boardImage.confirmPeg()
+                setTurnText()
+            }
         }
 
         setTurnText()
@@ -93,12 +95,12 @@ class GameScreen : Fragment() {
         if(binding.boardImage.isRedTurn()) {
             binding.textView.text = "Red Turn"
             binding.textView.setTextColor(Color.parseColor("#FF92322F"))
-            binding.textView.setOutlineSpotShadowColor(Color.BLACK)
+            binding.textView.setShadowLayer(4f,0f,0f,Color.BLACK)
         }
         else {
             binding.textView.text = "Black Turn"
             binding.textView.setTextColor(Color.BLACK)
-            binding.textView.setOutlineSpotShadowColor(Color.parseColor("#FF92322F"))
+            binding.textView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
         }
     }
 
