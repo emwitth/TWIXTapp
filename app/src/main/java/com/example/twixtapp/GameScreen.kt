@@ -1,6 +1,7 @@
 package com.example.twixtapp
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -67,7 +68,11 @@ class GameScreen : Fragment() {
 
         binding.placePieceButton.setOnClickListener {
             binding.boardImage.confirmPeg()
+            setTurnText()
         }
+
+        setTurnText()
+
     }
 
     override fun onDestroyView() {
@@ -82,6 +87,19 @@ class GameScreen : Fragment() {
 
         binding.boardImage.translationX = 0f
         binding.boardImage.translationY = 0f
+    }
+
+    private fun setTurnText() {
+        if(binding.boardImage.isRedTurn()) {
+            binding.textView.text = "Red Turn"
+            binding.textView.setTextColor(Color.parseColor("#FF92322F"))
+            binding.textView.setOutlineSpotShadowColor(Color.BLACK)
+        }
+        else {
+            binding.textView.text = "Black Turn"
+            binding.textView.setTextColor(Color.BLACK)
+            binding.textView.setOutlineSpotShadowColor(Color.parseColor("#FF92322F"))
+        }
     }
 
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {

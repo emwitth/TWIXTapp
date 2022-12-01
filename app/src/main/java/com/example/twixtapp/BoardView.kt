@@ -202,4 +202,8 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         yCoords = setupCoords.getYCoords(size)
     }
 
+    fun isRedTurn() : Boolean {
+        return isRedTurn
+    }
+
 }
