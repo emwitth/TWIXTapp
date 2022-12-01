@@ -64,6 +64,10 @@ class GameScreen : Fragment() {
         binding.resetBoardButton.setOnClickListener {
             resetBoard()
         }
+
+        binding.placePieceButton.setOnClickListener {
+            binding.boardImage.confirmPeg()
+        }
     }
 
     override fun onDestroyView() {
