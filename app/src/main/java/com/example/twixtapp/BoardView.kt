@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import kotlin.math.abs
 
 class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     // View size in pixels
@@ -102,7 +103,12 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             }
             else if(boardArray[checkRow][checkCol].isShown &&
                     boardArray[checkRow][checkCol].hasRightColor(isRedTurn)) {
-                addWall(Wall(row, checkRow, column, checkCol), tempWalls, color)
+                if(row < checkRow) {
+                    addWall(Wall(row, checkRow, column, checkCol), tempWalls, color)
+                }
+                else {
+                    addWall(Wall(checkRow, row, checkCol, column), tempWalls, color)
+                }
             }
         }
     }
@@ -136,6 +142,12 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun addWall(wall: Wall, walls: HashMap<Wall,WallCoords>, color: Int) {
+        if(isRedTurn) {
+            if(isBlockingWall(wall, blackWalls.keys)){return}
+        }
+        else {
+            if(isBlockingWall(wall, redWalls.keys)){return}
+        }
         if(wall !in walls) {
             walls[wall] = WallCoords(
                 xCoords[wall.row1][wall.column1],
@@ -144,6 +156,26 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 yCoords[wall.row2][wall.column2],
                 color)
         }
+    }
+
+    private fun isBlockingWall(wall: Wall, walls: MutableSet<Wall>) : Boolean {
+        for(w in walls) {
+            if(
+                ccw(wall.row1,wall.column1,w.row1,w.column1,w.row2,w.column2) !=
+                ccw(wall.row2,wall.column2,w.row1,w.column1,w.row2,w.column2) &&
+                ccw(wall.row1,wall.column1,wall.row2,wall.column2,w.row1,w.column1) !=
+                ccw(wall.row1,wall.column1,wall.row2,wall.column2,w.row2,w.column2)
+            )
+            {
+                return true
+            }
+        }
+        // if no walls intersecting
+        return false
+    }
+
+    fun ccw(Ax:Int, Ay:Int, Bx:Int, By:Int, Cx:Int, Cy:Int) : Boolean {
+        return (Cy-Ay) * (Bx-Ax) > (By-Ay) * (Cx-Ax)
     }
 
     fun touchPoint(x: Float, y: Float, sf: Float) {
