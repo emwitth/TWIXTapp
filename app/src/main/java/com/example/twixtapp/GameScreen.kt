@@ -118,13 +118,15 @@ class GameScreen : Fragment() {
         binding.winnerTextView.text = "RED WINS!"
         binding.winnerTextView.setTextColor(Color.parseColor("#FF92322F"))
         binding.winnerTextView.setShadowLayer(7f,0f,0f,Color.BLACK)
+        binding.textView.visibility = View.GONE
         binding.winnerTextView.visibility = View.VISIBLE
     }
 
     private fun setBlackWon() {
         binding.winnerTextView.text = "BLACK WINS!"
-        binding.textView.setTextColor(Color.BLACK)
-        binding.textView.setShadowLayer(7f,0f,0f, Color.parseColor("#FF92322F"))
+        binding.winnerTextView.setTextColor(Color.BLACK)
+        binding.winnerTextView.setShadowLayer(7f,0f,0f, Color.parseColor("#FF92322F"))
+        binding.textView.visibility = View.GONE
         binding.winnerTextView.visibility = View.VISIBLE
     }
 
