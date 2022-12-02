@@ -1,6 +1,7 @@
 package com.example.twixtapp
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -55,6 +56,8 @@ class GameScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.winnerTextView.visibility = View.GONE
+
         resetBoard()
 
         binding.exitButton.setOnClickListener {
@@ -66,8 +69,22 @@ class GameScreen : Fragment() {
         }
 
         binding.placePieceButton.setOnClickListener {
-            binding.boardImage.confirmPeg()
+            if(binding.boardImage.hasChosenValidOption()) {
+                binding.boardImage.confirmPeg()
+                if(binding.boardImage.hasRedWon) {
+                    setRedWon()
+                }
+                else if(binding.boardImage.hasBlackWon) {
+                    setBlackWon()
+                }
+                else {
+                    setTurnText()
+                }
+            }
         }
+
+        setTurnText()
+
     }
 
     override fun onDestroyView() {
@@ -84,6 +101,35 @@ class GameScreen : Fragment() {
         binding.boardImage.translationY = 0f
     }
 
+    private fun setTurnText() {
+        if(binding.boardImage.isRedTurn()) {
+            binding.textView.text = "Red Turn"
+            binding.textView.setTextColor(Color.parseColor("#FF92322F"))
+            binding.textView.setShadowLayer(4f,0f,0f,Color.BLACK)
+        }
+        else {
+            binding.textView.text = "Black Turn"
+            binding.textView.setTextColor(Color.BLACK)
+            binding.textView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
+        }
+    }
+
+    private fun setRedWon() {
+        binding.winnerTextView.text = "RED WINS!"
+        binding.winnerTextView.setTextColor(Color.parseColor("#FF92322F"))
+        binding.winnerTextView.setShadowLayer(7f,0f,0f,Color.BLACK)
+        binding.textView.visibility = View.GONE
+        binding.winnerTextView.visibility = View.VISIBLE
+    }
+
+    private fun setBlackWon() {
+        binding.winnerTextView.text = "BLACK WINS!"
+        binding.winnerTextView.setTextColor(Color.BLACK)
+        binding.winnerTextView.setShadowLayer(7f,0f,0f, Color.parseColor("#FF92322F"))
+        binding.textView.visibility = View.GONE
+        binding.winnerTextView.visibility = View.VISIBLE
+    }
+
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
 
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
@@ -94,7 +140,7 @@ class GameScreen : Fragment() {
 
         override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
             screen.mScaleFactor *= scaleGestureDetector.scaleFactor
-            screen.mScaleFactor = 0.95f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(10.0f))
+            screen.mScaleFactor = 0.95f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(5.0f))
 
             screen.binding.boardImage.scaleX = screen.mScaleFactor
             screen.binding.boardImage.scaleY = screen.mScaleFactor
@@ -111,7 +157,6 @@ class GameScreen : Fragment() {
 
     private class MyGestureListener(var screen: GameScreen) : SimpleOnGestureListener() {
         override fun onDown(event: MotionEvent?): Boolean {
-            Log.d("rootbeer", "onDown: ")
 
             // don't return false here or else none of the other
             // gestures will work
