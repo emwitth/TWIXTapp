@@ -56,6 +56,8 @@ class GameScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.winnerTextView.visibility = View.GONE
+
         resetBoard()
 
         binding.exitButton.setOnClickListener {
@@ -69,7 +71,15 @@ class GameScreen : Fragment() {
         binding.placePieceButton.setOnClickListener {
             if(binding.boardImage.hasChosenValidOption()) {
                 binding.boardImage.confirmPeg()
-                setTurnText()
+                if(binding.boardImage.hasRedWon) {
+                    setRedWon()
+                }
+                else if(binding.boardImage.hasBlackWon) {
+                    setBlackWon()
+                }
+                else {
+                    setTurnText()
+                }
             }
         }
 
@@ -102,6 +112,20 @@ class GameScreen : Fragment() {
             binding.textView.setTextColor(Color.BLACK)
             binding.textView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
         }
+    }
+
+    private fun setRedWon() {
+        binding.winnerTextView.text = "RED WINS!"
+        binding.winnerTextView.setTextColor(Color.parseColor("#FF92322F"))
+        binding.winnerTextView.setShadowLayer(7f,0f,0f,Color.BLACK)
+        binding.winnerTextView.visibility = View.VISIBLE
+    }
+
+    private fun setBlackWon() {
+        binding.winnerTextView.text = "BLACK WINS!"
+        binding.textView.setTextColor(Color.BLACK)
+        binding.textView.setShadowLayer(7f,0f,0f, Color.parseColor("#FF92322F"))
+        binding.winnerTextView.visibility = View.VISIBLE
     }
 
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
