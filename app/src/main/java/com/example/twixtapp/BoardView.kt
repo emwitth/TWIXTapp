@@ -14,6 +14,8 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var backgroundImage = ContextCompat.getDrawable(this.context, R.drawable.board)
     private var isRedTurn = true
     private var hasChosenValidOption = false
+    var hasRedWon = false
+    var hasBlackWon = false
 
     private var boardArray = Array(24) { Array(24){ Node() } }
     private var xCoords = Array(24) { FloatArray(24) }
@@ -43,15 +45,12 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun drawPegs(canvas: Canvas) {
-//        Log.d("rootbeer", "in drawPegs")
         paint.style = Paint.Style.FILL
         for((r, row) in boardArray.withIndex()) {
             for((c, column) in row.withIndex()) {
                 if(boardArray[r][c].isShown) {
                     paint.color = boardArray[r][c].color
                     canvas.drawCircle(xCoords[r][c], yCoords[r][c], 8f, paint)
-                    Log.d("rootbeer", "$r, $c")
-                    Log.d("rootbeer", "" + xCoords[r][c] + " " + yCoords[r][c])
                 }
             }
         }
@@ -134,6 +133,8 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             for ((wall, wallCoords) in tempWalls.entries) {
                 redWalls[wall] = wallCoords
                 redWalls[wall]?.color = Color.RED
+                boardArray[wall.row1][wall.column1].addCon(boardArray[wall.row2][wall.column2])
+                boardArray[wall.row2][wall.column2].addCon(boardArray[wall.row1][wall.column1])
             }
         }
         else {
@@ -143,9 +144,17 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             for ((wall, wallCoords) in tempWalls.entries) {
                 blackWalls[wall] = wallCoords
                 blackWalls[wall]?.color = Color.BLACK
+                boardArray[wall.row1][wall.column1].addCon(boardArray[wall.row2][wall.column2])
+                boardArray[wall.row2][wall.column2].addCon(boardArray[wall.row1][wall.column1])
+
             }
         }
         tempWalls = HashMap()
+
+        boardArray[tempRow][tempColumn].row = tempRow
+        boardArray[tempRow][tempColumn].column = tempColumn
+
+        checkWin()
 
         isRedTurn = !isRedTurn
         hasChosenValidOption = false
@@ -186,17 +195,91 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         return false
     }
 
-    fun ccw(Ax:Int, Ay:Int, Bx:Int, By:Int, Cx:Int, Cy:Int) : Boolean {
+    private fun checkWin() {
+        Log.v("rootbeer", "checking win")
+        if(isRedTurn) {
+            for(row in boardArray.indices) {
+                if(boardArray[row][0].isRed) {
+                    Log.v("rootbeer", "node (" + boardArray[row][0].row + ", " + boardArray[row][0].column + ") is red" )
+                    if(nodeConnectsToEnd(boardArray[row][0])) {
+                        hasRedWon = true
+                        Log.v("rootbeer", "BLACK WINS!")
+                        invalidate()
+                        break
+                    }
+                }
+                if(boardArray[row][1].isRed) {
+                    Log.v("rootbeer", "node (" + boardArray[row][1].row + ", " + boardArray[row][0].column + ") is red" )
+                    if(nodeConnectsToEnd(boardArray[row][1])) {
+                        hasRedWon = true
+                        Log.v("rootbeer", "RED WINS!")
+                        invalidate()
+                        break
+                    }
+                }
+            }
+        }
+        else {
+            for(node in boardArray[0]) {
+                if(node.isBlack) {
+                    Log.v("rootbeer", "node (" + node.row + ", " + node.column + ") is black" )
+                    if(nodeConnectsToEnd(node)) {
+                        hasBlackWon = true
+                        Log.v("rootbeer", "BLACK WINS!")
+                        break
+                    }
+                }
+            }
+            for(node in boardArray[1]) {
+                if(node.isBlack && !hasBlackWon) {
+                    Log.v("rootbeer", "node (" + node.row + ", " + node.column + ") is black" )
+                    if(nodeConnectsToEnd(node)) {
+                        hasBlackWon = true
+                        Log.v("rootbeer", "BLACK WINS!")
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+    private fun nodeConnectsToEnd(n: Node) : Boolean {
+        Log.v("rootbeer", "node: " + n.row + ", " + n.column)
+        if(isRedTurn && (n.column == 23 || n.column == 22)) {
+            return true
+        }
+        else if(!isRedTurn && (n.row == 23 || n.row == 22)) {
+            return true
+        }
+        var toReturn = false
+        for(con in n.cons) {
+            if(isRedTurn && con.column > n.column) {
+                toReturn = toReturn || nodeConnectsToEnd(con)
+            }
+            else if (!isRedTurn && con.row > n.row) {
+                toReturn = toReturn || nodeConnectsToEnd(con)
+            }
+        }
+        return toReturn
+    }
+
+    private fun ccw(Ax:Int, Ay:Int, Bx:Int, By:Int, Cx:Int, Cy:Int) : Boolean {
         return (Cy-Ay) * (Bx-Ax) > (By-Ay) * (Cx-Ax)
     }
 
     fun touchPoint(x: Float, y: Float, sf: Float) {
+        if(hasRedWon || hasBlackWon) {
+            return
+        }
         val xOnBoard = calculateCord(x, sf) - this.translationX/sf
         val yOnBoard = calculateCord(y, sf) - this.translationY/sf
         val column = kotlin.math.floor(xOnBoard / (this.width / 24))
         val row = kotlin.math.floor(yOnBoard / (this.width / 24))
-        if(!boardArray[row.toInt()][column.toInt()].isConfirmed) {
-            addPeg(row.toInt(), column.toInt())
+        val rowInt = row.toInt()
+        val colInt = column.toInt()
+        if(rowInt in 0 .. 23 && colInt in 0 .. 23 &&
+            !boardArray[rowInt][colInt].isConfirmed ) {
+            addPeg(rowInt, colInt)
         }
         this.invalidate()
     }

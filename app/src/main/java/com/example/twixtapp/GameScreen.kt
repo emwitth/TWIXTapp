@@ -131,7 +131,6 @@ class GameScreen : Fragment() {
 
     private class MyGestureListener(var screen: GameScreen) : SimpleOnGestureListener() {
         override fun onDown(event: MotionEvent?): Boolean {
-            Log.d("rootbeer", "onDown: ")
 
             // don't return false here or else none of the other
             // gestures will work
