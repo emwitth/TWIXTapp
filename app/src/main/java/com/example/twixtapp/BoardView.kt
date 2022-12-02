@@ -112,7 +112,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 continue
             }
             else if(boardArray[checkRow][checkCol].isShown &&
-                    boardArray[checkRow][checkCol].hasRightColor(isRedTurn)) {
+                boardArray[checkRow][checkCol].hasRightColor(isRedTurn)) {
                 if(row < checkRow) {
                     addWall(Wall(row, checkRow, column, checkCol), tempWalls, color)
                 }
@@ -201,7 +201,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             for(row in boardArray.indices) {
                 if(boardArray[row][0].isRed) {
                     Log.v("rootbeer", "node (" + boardArray[row][0].row + ", " + boardArray[row][0].column + ") is red" )
-                    if(nodeConnectsToEnd(boardArray[row][0])) {
+                    if(nodeConnectsToEnd(boardArray[row][0], mutableSetOf())) {
                         hasRedWon = true
                         Log.v("rootbeer", "BLACK WINS!")
                         invalidate()
@@ -210,7 +210,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 }
                 if(boardArray[row][1].isRed) {
                     Log.v("rootbeer", "node (" + boardArray[row][1].row + ", " + boardArray[row][0].column + ") is red" )
-                    if(nodeConnectsToEnd(boardArray[row][1])) {
+                    if(nodeConnectsToEnd(boardArray[row][1], mutableSetOf())) {
                         hasRedWon = true
                         Log.v("rootbeer", "RED WINS!")
                         invalidate()
@@ -223,7 +223,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             for(node in boardArray[0]) {
                 if(node.isBlack) {
                     Log.v("rootbeer", "node (" + node.row + ", " + node.column + ") is black" )
-                    if(nodeConnectsToEnd(node)) {
+                    if(nodeConnectsToEnd(node, mutableSetOf())) {
                         hasBlackWon = true
                         Log.v("rootbeer", "BLACK WINS!")
                         break
@@ -233,7 +233,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             for(node in boardArray[1]) {
                 if(node.isBlack && !hasBlackWon) {
                     Log.v("rootbeer", "node (" + node.row + ", " + node.column + ") is black" )
-                    if(nodeConnectsToEnd(node)) {
+                    if(nodeConnectsToEnd(node, mutableSetOf())) {
                         hasBlackWon = true
                         Log.v("rootbeer", "BLACK WINS!")
                         break
@@ -243,7 +243,7 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
     }
 
-    private fun nodeConnectsToEnd(n: Node) : Boolean {
+    private fun nodeConnectsToEnd(n: Node, seenNodes: MutableSet<Node>) : Boolean {
         Log.v("rootbeer", "node: " + n.row + ", " + n.column)
         if(isRedTurn && (n.column == 23 || n.column == 22)) {
             return true
@@ -252,12 +252,10 @@ class BoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             return true
         }
         var toReturn = false
+        seenNodes.add(n)
         for(con in n.cons) {
-            if(isRedTurn && con.column > n.column) {
-                toReturn = toReturn || nodeConnectsToEnd(con)
-            }
-            else if (!isRedTurn && con.row > n.row) {
-                toReturn = toReturn || nodeConnectsToEnd(con)
+            if(con !in seenNodes) {
+                toReturn = toReturn || nodeConnectsToEnd(con, seenNodes)
             }
         }
         return toReturn
