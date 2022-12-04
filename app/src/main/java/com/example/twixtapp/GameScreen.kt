@@ -88,20 +88,11 @@ class GameScreen : Fragment() {
                     viewModel.blackWalls,
                     viewModel.tempWalls)
                 binding.boardImage.invalidate()
-                if(viewModel.hasRedWon) {
-                    setRedWon()
-                }
-                else if(viewModel.hasBlackWon) {
-                    setBlackWon()
-                }
-                else {
-                    setTurnText()
-                }
+                checkWin()
             }
         }
 
-        setTurnText()
-
+        checkWin()
     }
 
     override fun onDestroyView() {
@@ -128,6 +119,18 @@ class GameScreen : Fragment() {
             binding.textView.text = "Black Turn"
             binding.textView.setTextColor(Color.BLACK)
             binding.textView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
+        }
+    }
+
+    private fun checkWin() {
+        if(viewModel.hasRedWon) {
+            setRedWon()
+        }
+        else if(viewModel.hasBlackWon) {
+            setBlackWon()
+        }
+        else {
+            setTurnText()
         }
     }
 
