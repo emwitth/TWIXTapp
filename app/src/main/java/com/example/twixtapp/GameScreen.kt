@@ -68,14 +68,14 @@ class GameScreen : Fragment() {
 
         binding.winnerTextView.visibility = View.GONE
 
-        resetBoard()
+        resetBoardPosn()
 
         binding.exitButton.setOnClickListener {
             findNavController().navigate(R.id.action_GameScreen_to_HomeScreen)
         }
 
         binding.resetBoardButton.setOnClickListener {
-            resetBoard()
+            resetBoardPosn()
         }
 
         binding.placePieceButton.setOnClickListener {
@@ -99,7 +99,7 @@ class GameScreen : Fragment() {
         _binding = null
     }
 
-    fun resetBoard() {
+    fun resetBoardPosn() {
         mScaleFactor = 0.95f
         binding.boardImage.scaleX = mScaleFactor
         binding.boardImage.scaleY = mScaleFactor
@@ -110,14 +110,14 @@ class GameScreen : Fragment() {
 
     private fun setTurnText() {
         if(viewModel.isRedTurn()) {
-            binding.textView.text = "Red Turn"
-            binding.textView.setTextColor(Color.parseColor("#FF92322F"))
-            binding.textView.setShadowLayer(4f,0f,0f,Color.BLACK)
+            binding.turnTextView.text = "Red Turn"
+            binding.turnTextView.setTextColor(Color.parseColor("#FF92322F"))
+            binding.turnTextView.setShadowLayer(4f,0f,0f,Color.BLACK)
         }
         else {
-            binding.textView.text = "Black Turn"
-            binding.textView.setTextColor(Color.BLACK)
-            binding.textView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
+            binding.turnTextView.text = "Black Turn"
+            binding.turnTextView.setTextColor(Color.BLACK)
+            binding.turnTextView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
         }
     }
 
@@ -137,7 +137,7 @@ class GameScreen : Fragment() {
         binding.winnerTextView.text = "RED WINS!"
         binding.winnerTextView.setTextColor(Color.parseColor("#FF92322F"))
         binding.winnerTextView.setShadowLayer(7f,0f,0f,Color.BLACK)
-        binding.textView.visibility = View.GONE
+        binding.turnTextView.visibility = View.GONE
         binding.winnerTextView.visibility = View.VISIBLE
     }
 
@@ -145,7 +145,7 @@ class GameScreen : Fragment() {
         binding.winnerTextView.text = "BLACK WINS!"
         binding.winnerTextView.setTextColor(Color.BLACK)
         binding.winnerTextView.setShadowLayer(7f,0f,0f, Color.parseColor("#FF92322F"))
-        binding.textView.visibility = View.GONE
+        binding.turnTextView.visibility = View.GONE
         binding.winnerTextView.visibility = View.VISIBLE
     }
 
@@ -198,7 +198,7 @@ class GameScreen : Fragment() {
         }
 
         override fun onDoubleTap(e: MotionEvent?): Boolean {
-            screen.resetBoard()
+            screen.resetBoardPosn()
             return true
         }
 
