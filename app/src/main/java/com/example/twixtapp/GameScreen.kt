@@ -8,6 +8,7 @@ import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.twixtapp.databinding.GameScreenBinding
 
@@ -29,6 +30,8 @@ class GameScreen : Fragment() {
     private var lastFocusX = 0f
     private var lastFocusY = 0f
 
+    private lateinit var viewModel: GameViewModel
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +39,15 @@ class GameScreen : Fragment() {
     ): View {
 
         _binding = GameScreenBinding.inflate(inflater, container, false)
+
+        viewModel = ViewModelProvider(requireActivity())[GameViewModel::class.java]
+
+        binding.boardImage.setElemens(
+            viewModel.boardArray,
+            viewModel.redWalls,
+            viewModel.blackWalls,
+            viewModel.tempWalls)
+        binding.boardImage.invalidate()
 
         scaleGestureDetector = ScaleGestureDetector(this.context, ScaleListener(this))
         mGestureDetector = GestureDetector(this.context, MyGestureListener(this))
@@ -50,7 +62,6 @@ class GameScreen : Fragment() {
         })
 
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,22 +80,19 @@ class GameScreen : Fragment() {
         }
 
         binding.placePieceButton.setOnClickListener {
-            if(binding.boardImage.hasChosenValidOption()) {
-                binding.boardImage.confirmPeg()
-                if(binding.boardImage.hasRedWon) {
-                    setRedWon()
-                }
-                else if(binding.boardImage.hasBlackWon) {
-                    setBlackWon()
-                }
-                else {
-                    setTurnText()
-                }
+            if(viewModel.hasChosenValidOption()) {
+                viewModel.confirmPeg()
+                binding.boardImage.setElemens(
+                    viewModel.boardArray,
+                    viewModel.redWalls,
+                    viewModel.blackWalls,
+                    viewModel.tempWalls)
+                binding.boardImage.invalidate()
+                checkWin()
             }
         }
 
-        setTurnText()
-
+        checkWin()
     }
 
     override fun onDestroyView() {
@@ -102,7 +110,7 @@ class GameScreen : Fragment() {
     }
 
     private fun setTurnText() {
-        if(binding.boardImage.isRedTurn()) {
+        if(viewModel.isRedTurn()) {
             binding.textView.text = "Red Turn"
             binding.textView.setTextColor(Color.parseColor("#FF92322F"))
             binding.textView.setShadowLayer(4f,0f,0f,Color.BLACK)
@@ -111,6 +119,18 @@ class GameScreen : Fragment() {
             binding.textView.text = "Black Turn"
             binding.textView.setTextColor(Color.BLACK)
             binding.textView.setShadowLayer(4f,0f,0f, Color.parseColor("#FF92322F"))
+        }
+    }
+
+    private fun checkWin() {
+        if(viewModel.hasRedWon) {
+            setRedWon()
+        }
+        else if(viewModel.hasBlackWon) {
+            setBlackWon()
+        }
+        else {
+            setTurnText()
         }
     }
 
@@ -165,7 +185,15 @@ class GameScreen : Fragment() {
 
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
             if(e != null) {
-                screen.binding.boardImage.touchPoint(e.x, e.y, screen.mScaleFactor)
+                val row = screen.binding.boardImage.calcRow(e.y, screen.mScaleFactor)
+                val column = screen.binding.boardImage.calcColumn(e.x, screen.mScaleFactor)
+                screen.viewModel.touchPoint(row, column)
+                screen.binding.boardImage.setElemens(
+                    screen.viewModel.boardArray,
+                    screen.viewModel.redWalls,
+                    screen.viewModel.blackWalls,
+                    screen.viewModel.tempWalls)
+                screen.binding.boardImage.invalidate()
             }
             return true
         }
