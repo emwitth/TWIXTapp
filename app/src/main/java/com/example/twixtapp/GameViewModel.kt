@@ -1,11 +1,7 @@
 package com.example.twixtapp
 
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 
 class GameViewModel : ViewModel() {
@@ -221,5 +217,54 @@ class GameViewModel : ViewModel() {
 
     fun hasChosenValidOption() : Boolean {
         return hasChosenValidOption
+    }
+
+    fun formatForFile() : List<String> {
+        var toReturn = mutableListOf<String>()
+
+        toReturn.add(isRedTurn.toString())
+        toReturn.add(hasChosenValidOption.toString())
+        toReturn.add("$tempRow $tempColumn")
+
+        val nodes = formatBoardArrayForFile()
+        toReturn.add(nodes.size.toString())
+        toReturn.addAll(nodes)
+
+        var walls = formatWallsForFile(redWalls)
+        toReturn.add(walls.size.toString())
+        toReturn.addAll(walls)
+
+        walls = formatWallsForFile(blackWalls)
+        toReturn.add(walls.size.toString())
+        toReturn.addAll(walls)
+
+        walls = formatWallsForFile(tempWalls)
+        toReturn.add(walls.size.toString())
+        toReturn.addAll(walls)
+
+        return toReturn
+    }
+
+    private fun formatBoardArrayForFile() : List<String> {
+        var toReturn = mutableListOf<String>()
+        for(row in boardArray.indices) {
+            for (node in boardArray[row]) {
+                if(node.isShown)
+                toReturn.add("" + node.column + " " + node.row + " "
+                        + node.color + " " + node.isRed + " "
+                        + node.isShown + " " + node.isConfirmed)
+            }
+        }
+        return toReturn
+    }
+
+    private fun formatWallsForFile(walls: HashMap<Wall, Int>) : List<String> {
+        var toReturn = mutableListOf<String>()
+        walls.forEach() {
+            toReturn.add("" + it.key.row1 + " " + it.key.row2
+                    + " " + it.key.column1 + " " + it.key.column2
+                    + " " + it.value )
+        }
+        return toReturn
     }
 }

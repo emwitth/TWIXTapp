@@ -1,20 +1,16 @@
 package com.example.twixtapp
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import androidx.lifecycle.ViewModelProvider
 import com.example.twixtapp.databinding.ActivityMainBinding
+import java.io.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    lateinit var viewModel: GameViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +19,65 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // view model instance
-        var viewModel: GameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
+        viewModel = ViewModelProvider(this)[GameViewModel::class.java]
+
+        // read file
+        var path = filesDir.canonicalPath
+        for(file in filesDir.listFiles()) {
+            Log.v("rootbeer", file.name)
+            if(file.name == "savedGame.txt") {
+                path = file.canonicalPath
+            }
+        }
+        try {
+            Log.v("rootbeer", "reading")
+            val fileReader = FileReader(path)
+            Log.v("rootbeer", fileReader.toString())
+//            Log.v("rootbeer", fileReader.readText())
+            for(line in fileReader.readLines())
+                Log.v("rootbeer", line)
+
+
+        } catch(e: Exception) {
+            Log.v("rootbeer",e.toString())
+            e.printStackTrace()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        var path = filesDir.canonicalPath
+        for(file in filesDir.listFiles()) {
+            Log.v("rootbeer", file.name)
+            if(file.name == "savedGame.txt") {
+                path = file.canonicalPath
+            }
+        }
+        if(path == filesDir.canonicalPath) {
+            path = "$path/savedGame.txt"
+        }
+        if(!viewModel.hasBlackWon && !viewModel.hasRedWon) {
+            try {
+                val fileWriter = FileWriter(path)
+                val currentBoard = viewModel.formatForFile()
+                for(line in currentBoard) {
+                    fileWriter.append(line+"\n")
+                }
+                fileWriter.close();
+            } catch (e: Exception) {
+                Log.v("rootbeer",e.toString())
+                e.printStackTrace()
+            }
+        }
+        else {
+            try {
+                val fileWriter = FileWriter(path)
+                fileWriter.append("start new game\n")
+                fileWriter.close();
+            } catch (e: Exception) {
+                Log.v("rootbeer",e.toString())
+                e.printStackTrace()
+            }
+        }
     }
 }
