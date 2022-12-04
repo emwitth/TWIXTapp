@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.twixtapp.databinding.HomeScreenBinding
 
@@ -32,8 +33,14 @@ class HomeScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        var viewModel = ViewModelProvider(requireActivity())[GameViewModel::class.java]
+
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_HomeScreen_to_GameScreen)
+        }
+
+        binding.buttonReset.setOnClickListener {
+            viewModel.reset()
         }
     }
 

@@ -33,10 +33,15 @@ class MainActivity : AppCompatActivity() {
             Log.v("rootbeer", "reading")
             val fileReader = FileReader(path)
             Log.v("rootbeer", fileReader.toString())
-//            Log.v("rootbeer", fileReader.readText())
-            for(line in fileReader.readLines())
-                Log.v("rootbeer", line)
-
+            val boardData =  fileReader.readLines()
+            if(boardData[0] != "start new game") {
+                Log.v("rootbeer", "loading data")
+                for(line in boardData) {
+                    Log.v("rootbeer", line)
+                }
+                Log.v("rootbeer","--------------------------------------")
+                viewModel.loadBoardData(boardData)
+            }
 
         } catch(e: Exception) {
             Log.v("rootbeer",e.toString())
