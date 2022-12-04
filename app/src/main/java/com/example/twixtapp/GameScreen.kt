@@ -13,7 +13,7 @@ import com.example.twixtapp.databinding.GameScreenBinding
 
 
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ * A simple [Fragment] subclass as the game screen
  */
 class GameScreen : Fragment() {
 
@@ -41,6 +41,7 @@ class GameScreen : Fragment() {
 
         viewModel = ViewModelProvider(requireActivity())[GameViewModel::class.java]
 
+        // when screen is created, need to set the boardImage view to the correct data
         binding.boardImage.setElemens(
             viewModel.boardArray,
             viewModel.redWalls,
@@ -48,10 +49,12 @@ class GameScreen : Fragment() {
             viewModel.tempWalls)
         binding.boardImage.invalidate()
 
+        // instantiate gesture detectors
         scaleGestureDetector = ScaleGestureDetector(this.context, ScaleListener(this))
         mGestureDetector = GestureDetector(this.context, MyGestureListener(this))
 
 
+        // setup gesture detectors
         binding.root.setOnTouchListener(View.OnTouchListener { _, event ->
             if(scaleGestureDetector?.isInProgress == false) {
                 mGestureDetector?.onTouchEvent(event)
@@ -66,21 +69,27 @@ class GameScreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // don't want to show unless won
         binding.winnerTextView.visibility = View.GONE
 
+        // set to initial position, slightly smaller than full screen width
         resetBoardPosn()
 
+        // go home on click of button
         binding.exitButton.setOnClickListener {
             findNavController().navigate(R.id.action_GameScreen_to_HomeScreen)
         }
 
+        // reset board position on click of button
         binding.resetBoardButton.setOnClickListener {
             resetBoardPosn()
         }
 
+        // confirm placement of the piece if a valid option has been chosen
         binding.placePieceButton.setOnClickListener {
-            if(viewModel.hasChosenValidOption()) {
+            if(viewModel.hasChosenValidOption) {
                 viewModel.confirmPeg()
+                // set view to new data from view model
                 binding.boardImage.setElemens(
                     viewModel.boardArray,
                     viewModel.redWalls,
@@ -94,11 +103,17 @@ class GameScreen : Fragment() {
         checkWin()
     }
 
+    /**
+     * destroys the view
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    /**
+     * resets the boards position to slightly smaller than screen width
+     */
     fun resetBoardPosn() {
         mScaleFactor = 0.95f
         binding.boardImage.scaleX = mScaleFactor
@@ -108,8 +123,12 @@ class GameScreen : Fragment() {
         binding.boardImage.translationY = 0f
     }
 
+    /**
+     * sets the text view to either red or black depending on who's turn it is
+     * including which styles it needs for that player
+     */
     private fun setTurnText() {
-        if(viewModel.isRedTurn()) {
+        if(viewModel.isRedTurn) {
             binding.turnTextView.text = "Red Turn"
             binding.turnTextView.setTextColor(Color.parseColor("#FF92322F"))
             binding.turnTextView.setShadowLayer(4f,0f,0f,Color.BLACK)
@@ -121,6 +140,9 @@ class GameScreen : Fragment() {
         }
     }
 
+    /**
+     * initiates the win check in the view model and acts on the result
+     */
     private fun checkWin() {
         if(viewModel.hasRedWon) {
             setRedWon()
@@ -133,6 +155,9 @@ class GameScreen : Fragment() {
         }
     }
 
+    /**
+     * makes visible the text view and sets it's style/contents
+     */
     private fun setRedWon() {
         binding.winnerTextView.text = "RED WINS!"
         binding.winnerTextView.setTextColor(Color.parseColor("#FF92322F"))
@@ -141,6 +166,9 @@ class GameScreen : Fragment() {
         binding.winnerTextView.visibility = View.VISIBLE
     }
 
+    /**
+     * makes visible the text view and sets it's style/contents
+     */
     private fun setBlackWon() {
         binding.winnerTextView.text = "BLACK WINS!"
         binding.winnerTextView.setTextColor(Color.BLACK)
@@ -149,14 +177,23 @@ class GameScreen : Fragment() {
         binding.winnerTextView.visibility = View.VISIBLE
     }
 
+    /**
+     * listener for scaling gesture. Needed to zoom into board
+     */
     private class ScaleListener constructor(var screen: GameScreen) : SimpleOnScaleGestureListener() {
 
+        /**
+         * sets the last focus, otherwise carries over from last scale gesture
+         */
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
             screen.lastFocusY = detector.focusY
             screen.lastFocusX = detector.focusX
             return true
         }
 
+        /**
+         * scales the board view according to the gesture, moves view as well according to focus movement
+         */
         override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
             screen.mScaleFactor *= scaleGestureDetector.scaleFactor
             screen.mScaleFactor = 0.95f.coerceAtLeast(screen.mScaleFactor.coerceAtMost(5.0f))
@@ -174,6 +211,9 @@ class GameScreen : Fragment() {
         }
     }
 
+    /**
+     * listener for non-scaling gestures
+     */
     private class MyGestureListener(var screen: GameScreen) : SimpleOnGestureListener() {
         override fun onDown(event: MotionEvent?): Boolean {
 
@@ -182,6 +222,9 @@ class GameScreen : Fragment() {
             return true
         }
 
+        /**
+         * single tap places peg and walls pre-image
+         */
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
             if(e != null) {
                 val row = screen.binding.boardImage.calcRow(e.y, screen.mScaleFactor)
@@ -197,11 +240,17 @@ class GameScreen : Fragment() {
             return true
         }
 
+        /**
+         * double tap resets the boards position
+         */
         override fun onDoubleTap(e: MotionEvent?): Boolean {
             screen.resetBoardPosn()
             return true
         }
 
+        /**
+         * scroll pans the boards position (translation)
+         */
         override fun onScroll(
             e1: MotionEvent?, e2: MotionEvent?,
             distanceX: Float, distanceY: Float
