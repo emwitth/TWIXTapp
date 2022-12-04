@@ -4,12 +4,12 @@
     <!-- Strings used for fragments for navigation -->
     <string name="home_screen_label">Home Screen</string>
     <string name="game_screen_label">Game Screen</string>
-    <string name="play">Play Game</string>
-    <string name="exit">Exit</string>
+    <string name="play">Continue Game</string>
+    <string name="exit">Home</string>
     <string name="reset">Re-Center</string>
     <string name="place">Place Piece</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="resetBoardString">Reset</string>
+    <string name="resetBoardString">New Game</string>
 </resources>

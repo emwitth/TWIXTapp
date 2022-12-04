@@ -280,6 +280,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun loadBoardData(boardData: List<String>) {
+        reset()
         isRedTurn = boardData[0].toBoolean()
         Log.v("rootbeer", isRedTurn.toString())
         hasChosenValidOption = boardData[1].toBoolean()

@@ -41,6 +41,7 @@ class HomeScreen : Fragment() {
 
         binding.buttonReset.setOnClickListener {
             viewModel.reset()
+            findNavController().navigate(R.id.action_HomeScreen_to_GameScreen)
         }
     }
 
