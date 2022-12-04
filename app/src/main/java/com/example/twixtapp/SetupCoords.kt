@@ -1,6 +1,9 @@
 package com.example.twixtapp
 
-public class SetupCoords {
+/**
+ * the hard coded coordinates (relative to size of board image)
+ */
+class SetupCoords {
 
      fun getXCoords(size: Int) : Array<FloatArray> {
         var xCoords = Array(24) { FloatArray(24) }

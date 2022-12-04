@@ -35,12 +35,15 @@ class HomeScreen : Fragment() {
 
         var viewModel = ViewModelProvider(requireActivity())[GameViewModel::class.java]
 
-        binding.buttonFirst.setOnClickListener {
+        // go to game screen
+        binding.buttonContinueGame.setOnClickListener {
             findNavController().navigate(R.id.action_HomeScreen_to_GameScreen)
         }
 
+        // go to game screen, but reset before
         binding.buttonReset.setOnClickListener {
             viewModel.reset()
+            findNavController().navigate(R.id.action_HomeScreen_to_GameScreen)
         }
     }
 
