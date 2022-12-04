@@ -50,9 +50,9 @@
         android:id="@+id/exit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
         android:text="@string/exit"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_background"
-        app:layout_constraintEnd_toStartOf="@id/reset_board_button"
         app:layout_constraintStart_toStartOf="@+id/drawer_background"
         app:layout_constraintTop_toTopOf="@+id/drawer_background" />
 
@@ -60,20 +60,20 @@
         android:id="@+id/place_piece_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
         android:text="@string/place"
-        app:layout_constraintTop_toTopOf="@+id/drawer_background"
+        app:layout_constraintBottom_toTopOf="@+id/reset_board_button"
         app:layout_constraintEnd_toEndOf="@id/drawer_background"
-        app:layout_constraintStart_toEndOf="@+id/exit_button"
-        app:layout_constraintBottom_toTopOf="@+id/reset_board_button" />
+        app:layout_constraintTop_toTopOf="@+id/drawer_background" />
 
     <Button
         android:id="@+id/reset_board_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
         android:text="@string/reset"
-        app:layout_constraintTop_toBottomOf="@+id/place_piece_button"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_background"
         app:layout_constraintEnd_toEndOf="@+id/drawer_background"
-        app:layout_constraintStart_toEndOf="@+id/exit_button"
-        app:layout_constraintBottom_toBottomOf="@+id/drawer_background" />
+        app:layout_constraintTop_toBottomOf="@+id/place_piece_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
