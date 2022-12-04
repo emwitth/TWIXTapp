@@ -358,8 +358,13 @@ class GameViewModel : ViewModel() {
         for(d in wallData) {
             Log.v("rootbeer","$d")
         }
-        val wall = Wall(wallData[0].toInt(), wallData[1].toInt(),
-            wallData[2].toInt(), wallData[3].toInt())
+        val row1 = wallData[0].toInt()
+        val row2 = wallData[1].toInt()
+        val column1 = wallData[2].toInt()
+        val column2 = wallData[3].toInt()
+        val wall = Wall(row1, row2, column1, column2)
         walls[wall] = wallData[4].toInt()
+        boardArray[row1][column1].addCon(boardArray[row2][column2])
+        boardArray[row2][column2].addCon(boardArray[row1][column1])
     }
 }
