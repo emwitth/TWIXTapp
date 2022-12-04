@@ -282,21 +282,16 @@ class GameViewModel : ViewModel() {
     fun loadBoardData(boardData: List<String>) {
         reset()
         isRedTurn = boardData[0].toBoolean()
-        Log.v("rootbeer", isRedTurn.toString())
         hasChosenValidOption = boardData[1].toBoolean()
-        Log.v("rootbeer", hasChosenValidOption.toString())
 
         Log.v("rootbeer", "loading nodes")
         var startIndex = 3
         var endIndex = startIndex +  boardData[2].toInt()
-        Log.v("rootbeer", "$startIndex $endIndex")
         if(startIndex != endIndex) {
             for (i in startIndex..endIndex) {
                 if(i == endIndex) {
                     break
                 }
-                Log.v("rootbeer", "$i")
-                Log.v("rootbeer", boardData[i])
                 updateNode(boardData[i].split(" "))
             }
             startIndex = endIndex + 1
@@ -308,14 +303,11 @@ class GameViewModel : ViewModel() {
         }
 
         Log.v("rootbeer", "loading redWalls")
-        Log.v("rootbeer", "$startIndex $endIndex")
         if(startIndex != endIndex) {
             for (i in startIndex..endIndex) {
                 if(i == endIndex) {
                     break
                 }
-                Log.v("rootbeer", "$i")
-                Log.v("rootbeer", boardData[i])
                 addWall(boardData[i].split(" "), redWalls)
             }
             startIndex = endIndex + 1
@@ -327,14 +319,11 @@ class GameViewModel : ViewModel() {
         }
 
         Log.v("rootbeer", "loading black walls")
-        Log.v("rootbeer", "$startIndex $endIndex")
         if(startIndex != endIndex) {
             for (i in startIndex..endIndex) {
                 if(i == endIndex) {
                     break
                 }
-                Log.v("rootbeer", "$i")
-                Log.v("rootbeer", boardData[i])
                 addWall(boardData[i].split(" "), blackWalls)
             }
         }
@@ -343,7 +332,6 @@ class GameViewModel : ViewModel() {
     private fun updateNode(nodeData: List<String>) {
         val column = nodeData[0].toInt()
         val row = nodeData[1].toInt()
-        Log.v("rootbeer","$row $column")
         boardArray[row][column].isShown = true
         boardArray[row][column].color = nodeData[2].toInt()
         boardArray[row][column].isRed = nodeData[3].toBoolean()
@@ -355,9 +343,7 @@ class GameViewModel : ViewModel() {
     }
 
     private fun addWall(wallData: List<String>, walls: HashMap<Wall, Int>) {
-        Log.v("rootbeer","in add wall")
         for(d in wallData) {
-            Log.v("rootbeer","$d")
         }
         val row1 = wallData[0].toInt()
         val row2 = wallData[1].toInt()

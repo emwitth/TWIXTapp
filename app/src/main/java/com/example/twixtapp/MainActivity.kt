@@ -1,7 +1,6 @@
 package com.example.twixtapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.twixtapp.databinding.ActivityMainBinding
@@ -24,27 +23,18 @@ class MainActivity : AppCompatActivity() {
         // read file
         var path = filesDir.canonicalPath
         for(file in filesDir.listFiles()) {
-            Log.v("rootbeer", file.name)
             if(file.name == "savedGame.txt") {
                 path = file.canonicalPath
             }
         }
         try {
-            Log.v("rootbeer", "reading")
             val fileReader = FileReader(path)
-            Log.v("rootbeer", fileReader.toString())
             val boardData =  fileReader.readLines()
             if(boardData[0] != "start new game") {
-                Log.v("rootbeer", "loading data")
-                for(line in boardData) {
-                    Log.v("rootbeer", line)
-                }
-                Log.v("rootbeer","--------------------------------------")
                 viewModel.loadBoardData(boardData)
             }
 
         } catch(e: Exception) {
-            Log.v("rootbeer",e.toString())
             e.printStackTrace()
         }
     }
@@ -53,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         var path = filesDir.canonicalPath
         for(file in filesDir.listFiles()) {
-            Log.v("rootbeer", file.name)
             if(file.name == "savedGame.txt") {
                 path = file.canonicalPath
             }
@@ -70,7 +59,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 fileWriter.close();
             } catch (e: Exception) {
-                Log.v("rootbeer",e.toString())
                 e.printStackTrace()
             }
         }
@@ -80,7 +68,6 @@ class MainActivity : AppCompatActivity() {
                 fileWriter.append("start new game\n")
                 fileWriter.close();
             } catch (e: Exception) {
-                Log.v("rootbeer",e.toString())
                 e.printStackTrace()
             }
         }
