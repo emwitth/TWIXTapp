@@ -17,6 +17,20 @@ class GameViewModel : ViewModel() {
     var blackWalls = HashMap<Wall,Int>()
     var tempWalls = HashMap<Wall,Int>()
 
+    fun reset() {
+        isRedTurn = true
+        hasChosenValidOption = false
+        hasRedWon = false
+        hasBlackWon = false
+
+        boardArray = Array(24) { Array(24){ Node() } }
+        tempRow = 0
+        tempColumn = 0
+        redWalls = HashMap<Wall,Int>()
+        blackWalls = HashMap<Wall,Int>()
+        tempWalls = HashMap<Wall,Int>()
+    }
+
     private fun addPeg(row: Int, column: Int) {
         if(isRedTurn && (row == 0 || row == 23)) {
             return
@@ -224,7 +238,6 @@ class GameViewModel : ViewModel() {
 
         toReturn.add(isRedTurn.toString())
         toReturn.add(hasChosenValidOption.toString())
-        toReturn.add("$tempRow $tempColumn")
 
         val nodes = formatBoardArrayForFile()
         toReturn.add(nodes.size.toString())
@@ -238,10 +251,6 @@ class GameViewModel : ViewModel() {
         toReturn.add(walls.size.toString())
         toReturn.addAll(walls)
 
-        walls = formatWallsForFile(tempWalls)
-        toReturn.add(walls.size.toString())
-        toReturn.addAll(walls)
-
         return toReturn
     }
 
@@ -249,10 +258,12 @@ class GameViewModel : ViewModel() {
         var toReturn = mutableListOf<String>()
         for(row in boardArray.indices) {
             for (node in boardArray[row]) {
-                if(node.isShown)
-                toReturn.add("" + node.column + " " + node.row + " "
-                        + node.color + " " + node.isRed + " "
-                        + node.isShown + " " + node.isConfirmed)
+                if(node.isShown) {
+                    toReturn.add(
+                        "" + node.column + " " + node.row + " "
+                                + node.color + " " + node.isRed
+                    )
+                }
             }
         }
         return toReturn
@@ -266,5 +277,94 @@ class GameViewModel : ViewModel() {
                     + " " + it.value )
         }
         return toReturn
+    }
+
+    fun loadBoardData(boardData: List<String>) {
+        isRedTurn = boardData[0].toBoolean()
+        Log.v("rootbeer", isRedTurn.toString())
+        hasChosenValidOption = boardData[1].toBoolean()
+        Log.v("rootbeer", hasChosenValidOption.toString())
+
+        Log.v("rootbeer", "loading nodes")
+        var startIndex = 3
+        var endIndex = startIndex +  boardData[2].toInt()
+        Log.v("rootbeer", "$startIndex $endIndex")
+        if(startIndex != endIndex) {
+            for (i in startIndex..endIndex) {
+                if(i == endIndex) {
+                    break
+                }
+                Log.v("rootbeer", "$i")
+                Log.v("rootbeer", boardData[i])
+                updateNode(boardData[i].split(" "))
+            }
+            startIndex = endIndex + 1
+            endIndex = startIndex + boardData[startIndex - 1].toInt()
+        }
+        else {
+            startIndex = endIndex + 1
+            endIndex = startIndex + boardData[startIndex - 1].toInt()
+        }
+
+        Log.v("rootbeer", "loading redWalls")
+        Log.v("rootbeer", "$startIndex $endIndex")
+        if(startIndex != endIndex) {
+            for (i in startIndex..endIndex) {
+                if(i == endIndex) {
+                    break
+                }
+                Log.v("rootbeer", "$i")
+                Log.v("rootbeer", boardData[i])
+                addWall(boardData[i].split(" "), redWalls)
+            }
+            startIndex = endIndex + 1
+            endIndex = startIndex + boardData[startIndex - 1].toInt()
+        }
+        else {
+            startIndex = endIndex + 1
+            endIndex = startIndex + boardData[startIndex - 1].toInt()
+        }
+
+        Log.v("rootbeer", "loading black walls")
+        Log.v("rootbeer", "$startIndex $endIndex")
+        if(startIndex != endIndex) {
+            for (i in startIndex..endIndex) {
+                if(i == endIndex) {
+                    break
+                }
+                Log.v("rootbeer", "$i")
+                Log.v("rootbeer", boardData[i])
+                addWall(boardData[i].split(" "), blackWalls)
+            }
+        }
+    }
+
+    private fun updateNode(nodeData: List<String>) {
+        val column = nodeData[0].toInt()
+        val row = nodeData[1].toInt()
+        Log.v("rootbeer","$row $column")
+        boardArray[row][column].isShown = true
+        boardArray[row][column].color = nodeData[2].toInt()
+        boardArray[row][column].isRed = nodeData[3].toBoolean()
+        boardArray[row][column].isBlack = !boardArray[row][column].isRed
+        boardArray[row][column].isConfirmed = true
+        boardArray[row][column].row = row
+        boardArray[row][column].column = column
+        Log.v("rootbeer", "End update Node")
+    }
+
+    private fun addWall(wallData: List<String>, walls: HashMap<Wall, Int>) {
+        Log.v("rootbeer","in add wall")
+        for(d in wallData) {
+            Log.v("rootbeer","$d")
+        }
+        val row1 = wallData[0].toInt()
+        val row2 = wallData[1].toInt()
+        val column1 = wallData[2].toInt()
+        val column2 = wallData[3].toInt()
+        val wall = Wall(row1, row2, column1, column2)
+        walls[wall] = wallData[4].toInt()
+        boardArray[row1][column1].addCon(boardArray[row2][column2])
+        boardArray[row2][column2].addCon(boardArray[row1][column1])
     }
 }
