@@ -182,8 +182,8 @@ class GameScreen : Fragment() {
 
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
             if(e != null) {
-                val row = screen.binding.boardImage.calcRow(e.x, screen.mScaleFactor)
-                val column = screen.binding.boardImage.calcColumn(e.y, screen.mScaleFactor)
+                val row = screen.binding.boardImage.calcRow(e.y, screen.mScaleFactor)
+                val column = screen.binding.boardImage.calcColumn(e.x, screen.mScaleFactor)
                 screen.viewModel.touchPoint(row, column)
                 screen.binding.boardImage.setElemens(
                     screen.viewModel.boardArray,
